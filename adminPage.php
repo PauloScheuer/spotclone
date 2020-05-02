@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <!--
 To change this license //header, choose License //Headers in Project Properties.
 To change this template file, choose Tools | Templates
@@ -32,7 +32,7 @@ and open the template in the editor.
             var $DinSelect = document.querySelector(divT),
             HTMLTemp = $DinSelect.innerHTML,
             HTMLNew = "<select name='"+divTrue+"AlbArt"+contrB+"'><?php
-            echo "<option value='null'>------</option>";
+            echo "<option value='null'>Nenhum</option>";
                 include './conexao.php';
                 $sql = "SELECT idArtist,nameArtist FROM artist";
                 $sqlDo = $db->prepare($sql);
@@ -77,8 +77,7 @@ and open the template in the editor.
                         echo "<option value='$rs->idGenre'>$rs->nameGenre</option>";
                     }
                 }
-                ?></select>\n\
-                <input type='hidden' value='"+contrBG+"' name='cg'></select><br>";
+                ?></select>";
                HTMLTemp =  HTMLTemp + HTMLNew;
                $DinSelectG.innerHTML = HTMLTemp;
                contrBG++;
@@ -101,6 +100,7 @@ and open the template in the editor.
                 <input type='hidden' value='"+contrBM+"' name='c'></select><br>";
             HTMLTemp =  HTMLTemp + HTMLNew;
             $DinSelectM.innerHTML = HTMLTemp;
+            
             contrBM++;
         }
         </script>
@@ -323,188 +323,182 @@ alert("Preencha todos os campos!");
 
 //inserção de músicas em um álbum
 if(!empty($_POST['subMusic'])){
-    if(!empty($_POST['album']) and !empty($_POST['nameMusic1']) and !empty($_FILES['fileMusic1'])){
-       $idAlbum = $_POST['album'];
-       $c =  $_POST['c'];
-       if(empty($_POST['cg'])){
-          echo '<script language= "JavaScript">
-location.href="adminPage.php";
-alert("As músicas precisam de gêneros!");
-</script>'; 
-       }else{
-          $cg = $_POST['cg'];
-       }
-       if(empty($_POST['co'])){
-            echo '<script language= "JavaScript">
-location.href="adminPage.php";
-alert("Erro, clique no mais!");
-</script>';
-        }else{
-       $co = $_POST['co'];
-        
-       $i=0;
-       while ($i<$c){
-           
-           $ii = $i+1;
-           
-           $whileI = 0;
-        while($whileI<$co){
-            $wii= $whileI+1;
-            if(!empty($_POST["two$ii"."AlbArt$wii"]) and $_POST["two$ii"."AlbArt$wii"] != 'null'){
-            $artistas[] = $_POST["two$ii"."AlbArt$wii"];
-            }else{
-                $artistas = 'null';
-            }
-            $whileI++;
-        }
-        $whileJ = 0;
-        while($whileJ<$cg){
-            $wjj= $whileJ+1;
-            if(!empty($_POST["twog$ii"."MusGen$wjj"]) and $_POST["twog$ii"."MusGen$wjj"] != 'null'){
-            $genres[] = $_POST["twog$ii"."MusGen$wjj"];
-            }else{
-                $genres = 'null';
-            }
-            $whileJ++;
-        }
-           
-           $nameMusic = str_replace("'", "***", $_POST['nameMusic'.$ii]);
-           $fileMusic = $_FILES['fileMusic'.$ii];
-           
-           $featMusic = $artistas;
-           $error = array();
-if ($fileMusic["type"] !== "audio/mp3") {
-    $error[1] = "Você deve enviar um áudio em mp3.";
-}
-if (count($error) == 0) {
-    $ext = "mp3";
-    $fileMusicFile = md5(uniqid(time())) . "." . $ext;
-    $fileMusicPath = "musics/" . $fileMusicFile;
-    $sqlMus = "INSERT INTO music (nameMusic,fileMusic,idAlbum) VALUES "
-            . "('$nameMusic','$fileMusicFile',$idAlbum)";
-    $sqlMusDo = $db->prepare($sqlMus);
-    if($sqlMusDo->execute()){
-    move_uploaded_file($fileMusic["tmp_name"], $fileMusicPath);
-    $sqlArtMus1 = "SELECT idArtist FROM albumartist WHERE idAlbum = $idAlbum";
-    $sqlArtMus1Do = $db->prepare($sqlArtMus1);
-    $lastID = $db->lastInsertId();
-    $sqlArtMus1Do->execute();
-    if($sqlArtMus1Do->rowcount() > 0){
-                    while ($rs = $sqlArtMus1Do->fetch(PDO::FETCH_OBJ)){
-                       $sqlArtMus2 = "INSERT INTO `musicartist`(`idMusic`, `idArtist`) VALUES ($lastID,$rs->idArtist)";
-                       $sqlArtMus2Do = $db->prepare($sqlArtMus2);
-                       if($sqlArtMus2Do->execute()){
-                           
-                           if($artistas !== 'null'){
-                           $it = 0;
-                           $sizze = count($featMusic);
-                           while ($it<$sizze){
-                           $sqlLastInsert = "INSERT INTO `musicartist`(`idMusic`, `idArtist`) VALUES ($lastID,$featMusic[$it])";
-                           $sqlFdo = $db->prepare($sqlLastInsert);
-                           
-                           if($sqlFdo->execute()){
-                               
-                               if($genres !== 'null'){
-                           $jt = 0;
-                           $sizzee = count($genres);
-                           while ($jt<$sizzee){
-                           $sqlLastInsert = "INSERT INTO `musicgenre`(`idMusic`, `idGenre`) VALUES ($lastID,$genres[$jt])";
-                           $sqlFdo = $db->prepare($sqlLastInsert);
-                           
-                           if($sqlFdo->execute()){
-                               
-                               echo '<script language= "JavaScript">
-location.href="adminPage.php";
-alert("Deu tudo certo!");
-</script>';
-                           }else{
-                               echo '<script language= "JavaScript">
-location.href="adminPage.php";
-alert("Erro ao ligar música ao genero!");
-</script>';
-                           }
-                           
-                           $jt++;
-                           }
-                           }
-                           }else{
-                               echo '<script language= "JavaScript">
-location.href="adminPage.php";
-alert("Erro ao ligar música aos artistas adicionais!");
-</script>';
-                           }
-                           
-                           
-                           $it++;
-                           }
-                           }else{
-                               
-                                if($genres !== 'null'){
-                           $jt = 0;
-                           $sizzee = count($genres);
-                           while ($jt<$sizzee){
-                           $sqlLastInsert = "INSERT INTO `musicgenre`(`idMusic`, `idGenre`) VALUES ($lastID,$genres[$jt])";
-                           $sqlFdo = $db->prepare($sqlLastInsert);
-                           
-                           if($sqlFdo->execute()){
-                               
-                               echo '<script language= "JavaScript">
-location.href="adminPage.php";
-alert("Deu tudo certo!");
-</script>';
-                           }else{
-                               echo '<script language= "JavaScript">
-location.href="adminPage.php";
-alert("Erro ao ligar música ao genero!");
-</script>';
-                           }
-                           
-                           $jt++;
-                           }
-                           }
-                           unset($genres);
-                               echo '<script language= "JavaScript">
-location.href="adminPage.php";
-alert("Inserção realizada!");
-</script>';
-                               
-                           }
-                           
-                       }else{
-                           echo '<script language= "JavaScript">
-location.href="adminPage.php";
-alert("Deu erro ao ligar música e artista do álbum!");
-</script>';
-                       }
-                    }
-                }
-                //até aqui
-                unset($genres);
-                           unset($artistas);
-                           unset($featMusic);
-    }else{
-        echo '<script language= "JavaScript">
-location.href="adminPage.php";
-alert("FDeu erro na inserção da música!'.$fileMusicFile.'");
-</script>';
-    }
+    if(!empty($_POST['album'])){
+    include './conexao.php';
+    //definição das variáveis necessárias
+    $album = $_POST['album']; // album onde vão ser inseridas as músicas
+    $names = array(); //array contendo o nome das músicas
+    $files = array(); //array contendo os arquivos das músicas
+    $artists = array(); // array(que conterá outros arrays) com os artistas extras
+    $initArtists = array(); //array(que conterá outros arrays) com os artistas do álbum
+    $genres = array(); // array(que conterá outros arrays) com os gêneros
+    $numMusic = $_POST['c']; //número de músicas sendo inseridas na execução
+    $error = array(); // array com os possíveis erros na execução
+    $values = "";//variável contendo todos os valores das músicas
+    $valuesG = ""; //variável contendo todos os valores da tabela musicgenre
+    $valuesA = ""; //variável contendo todos os valores da tabela musicartist
+    $multipleID = array(); //array contendo os IDS inseridos
     
-}
- if (count($error) != 0) {
-    foreach ($error as $erro) {
-        echo "<script language= 'JavaScript'>
-alert('$erro');
-</script>";
+    //repetição que preencherá os arrays
+    $iGeneral = 0;
+    while ($iGeneral<$numMusic){
+        $ii = $iGeneral+1;
+        if( !empty($_POST["nameMusic$ii"]) and !empty($_FILES["fileMusic$ii"]) ){
+        $names[] =  str_replace("'", "***", $_POST["nameMusic$ii"]);
+        $files[] = $_FILES["fileMusic$ii"];
+        
+        //tratamento do arquivo de som
+        if ($files[$iGeneral]["type"] !== "audio/mp3") {
+        $error[] = "Você deve enviar um áudio em mp3.";
+        }else{
+        $ext = "mp3";
+        $files[$iGeneral][0] = md5(uniqid(time())) . "." . $ext;
+        $files[$iGeneral][1] = "musics/" . $files[$iGeneral][0];
+        
+        //preenchimento dos valores que irão dentro da tabela música
+        
+        if($iGeneral == 0){
+        $values.= "('".$names[$iGeneral]."','".$files[$iGeneral][0]."',".$album.")";   
+        }else{
+        $values.= ",('".$names[$iGeneral]."','".$files[$iGeneral][0]."',".$album.")";   
+        } 
+        
+        //preenchimento dos valores que irão na tabela musicgenre
+
+        $genres[$ii] = array();
+        $iGenre = 1;
+        while($iGenre<=3){
+            if(!empty($_POST['twog'.$ii.'MusGen'.$iGenre]) and $_POST['twog'.$ii.'MusGen'.$iGenre] != 'null'){
+        $genres[$ii][] = $_POST['twog'.$ii.'MusGen'.$iGenre]; 
+            }
+        $iGenre++;
+        }
+        
+        
+        //preenchimento dos valores que irão na tabela musicartist
+        $artists[$ii] = array();
+        //primeira etapa, artistas do álbum
+        $sqlgetArt = "SELECT idArtist from albumartist WHERE idAlbum = $album";// obter artistas do álbum que a música pertence
+            $sqlgetArtdo = $db->prepare($sqlgetArt);
+            $sqlgetArtdo->execute();
+            if($sqlgetArtdo->rowcount()>0){
+                while ($rs = $sqlgetArtdo->fetch(PDO::FETCH_OBJ)){
+                  $artists[$ii][] = $rs->idArtist;  
+                }
+            }
+        //segunda etapa, artistas extras:
+        $iArt = 1;
+        while($iArt<=30){
+            if(!empty($_POST['two'.$ii.'AlbArt'.$iArt]) and $_POST['two'.$ii.'AlbArt'.$iArt] != 'null'){
+        $artists[$ii][] = $_POST['two'.$ii.'AlbArt'.$iArt]; 
+            }
+        $iArt++;
+        }
+        
+        }
+        
+        }else{
+            $error[] = "Você deve preencher todos os campos de nomes/arquivos de todas as músicas"; 
+        }
+        if(empty($genres[$ii])){
+            $error[] = "Cada música deve ter ao menos um gênero";
+        }
+        $iGeneral++;
     }
- }           
-           $i++;
-       }
+    if(empty($error)){
+    $sqlMus = "INSERT INTO `music`(`nameMusic`, `fileMusic`, `idAlbum`) VALUES $values;";
+    $sqlMusDo = $db->prepare($sqlMus);
+    $sqlMusDo->execute(); //execução da inserção na tabela music
+    if($sqlMusDo->rowcount()>0){
+        //upload das músicas no servidor
+        $iUpload = 0;
+        while ($iUpload<$numMusic){
+        move_uploaded_file($files[$iUpload]["tmp_name"], $files[$iUpload][1]);
+        $iUpload++;
+        }
+        //obtenção dos ids inseridos
+        $firstID = $db->lastInsertId();
+        $iID = 0;
+        while ($iID<$numMusic){
+            $multipleID[] = $firstID+$iID;
+            $iID++;
+        }
+        //preenchimento da variável valuesG
+        $ivg = 0; //variavel values-genres
+        while ($ivg<$numMusic){
+            $jvg = 0;//variavel values-genres secundária
+            while ($jvg<3){
+            if(!empty($genres[$ivg+1][$jvg])){
+            if($ivg == 0 and $jvg==0){
+            $valuesG .= "($multipleID[$ivg],".$genres[$ivg+1][$jvg].")";
+            
+            }else{
+            $valuesG .= ",($multipleID[$ivg],".$genres[$ivg+1][$jvg].")";    
+            }
+            }
+            $jvg++;
+            }
+            $ivg++;
+        }
+        //preenchimento da variável valuesA
+        $iva = 0; //variavel values-artists
+        while ($iva<$numMusic){
+            $jva = 0;//variavel values-artists secundária
+            while ($jva<=30){
+            if(!empty($artists[$iva+1][$jva])){
+            if($iva == 0 and $jva==0){
+            $valuesA .= "($multipleID[$iva],".$artists[$iva+1][$jva].")";
+            
+            }else{
+            $valuesA .= ",($multipleID[$iva],".$artists[$iva+1][$jva].")";    
+            }
+            }
+            $jva++;
+            }
+            $iva++;
+        }
+        $sqlmusgen = "INSERT INTO `musicgenre`(`idMusic`, `idGenre`) VALUES $valuesG"; //sql inserção musicgenre
+        $sqlmusgendo = $db->prepare($sqlmusgen);
+        $sqlmusgendo->execute();
+        if($sqlmusgendo->rowcount()>0){
+          $sqlmusart = "INSERT INTO `musicartist`(`idMusic`, `idArtist`) VALUES $valuesA"; //sql inserção musicartist
+          $sqlmusartdo = $db->prepare($sqlmusart);
+          $sqlmusartdo->execute();
+          if($sqlmusartdo->rowcount()>0){
+              echo "<script language= 'JavaScript'>
+                    alert('Inserção realizada com sucesso!');
+                    location.href = 'adminPage.php';
+                    </script>";
+                
+          }else{
+              echo "<script language= 'JavaScript'>
+                    alert('Música inserida, mas ouve um problema no relacionamento dela com seus artistas, fav
+                    or entrar em contato');
+                    location.href = 'adminPage.php';
+                    </script>";
+          }
+        }else{
+            echo "<script language= 'JavaScript'>
+                    alert('Música inserida, mas ouve um problema no relacionamento dela com seus gêneros, fav
+                    or entrar em contato');
+                    location.href = 'adminPage.php';
+                    </script>";
         }
     }else{
-            echo '<script language= "JavaScript">
-location.href="adminPage.php";
-alert("Faltou preencher todos os campos!");
-</script>';
+        echo "<script language= 'JavaScript'>
+                    alert('Música não inserida :(');
+                    location.href = 'adminPage.php';
+                    </script>";
+    }
+    }else{
+        if (count($error) != 0) {
+        foreach ($error as $erro) {
+        echo "<script language= 'JavaScript'>
+        alert('$erro');
+        location.href = 'adminPage.php';
+        </script>";
+    }
+    }
+    }
     }
 }
-?>

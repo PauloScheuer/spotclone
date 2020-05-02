@@ -26,7 +26,9 @@ function initPage(){
         currentAudioId = sessionStorage.getItem('music');
         currentAudio = document.getElementById(currentAudioId);
         currentAudio.currentTime = currentTime;
+        control = 0;
         tocar(currentAudioId);
+        
     }
     }
     

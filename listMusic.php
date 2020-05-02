@@ -21,8 +21,7 @@ if ($sqlDo->rowcount() > 0) {
                 . "background-size: cover"
                 . "}"
                 . "</style>"
-        . "<div class='music' id='music$rs->idMusic' onclick='tocar($rs->idMusic ,`$rs->fileMusic`, `$rs->photoAlbum`,"
-                . " `$rs->nameMusic`)' >"
+        . "<div class='music' id='music$rs->idMusic' onclick='tocar($rs->idMusic, true)' >"
                 . "<div class='playButton'><img src='icons/play.svg' id='imgPlayCard$rs->idMusic'></div>"
                 . "<div class='nameMusic' ><p>".str_replace("***", "'", $rs->nameMusic)."</p></div>";
         $sql2 = "SELECT * FROM artist, musicartist where artist.idArtist = musicartist.idArtist and musicartist.idMusic=$rs->idMusic";

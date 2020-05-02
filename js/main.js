@@ -1,13 +1,32 @@
 var control = 1;
 ableSkip = false;
-function tocar(id,file,photo,name){
+function tocar(id,newpl){
     
+     getData(id).then(function() {
+        if(newpl == true){
+        sessionStorage.setItem('nowMusic',0);
+        getID().then(function() {
+        var firstID = playlist[0];
+        var numString = id.toString()
+        var VIP = playlist.indexOf(numString);
+        playlist[VIP] = firstID;
+        playlist[0] = id;
+        
+        console.log(playlist);
+    });
+    }
      if (sessionStorage.getItem('music') != null){
         audioBefID = sessionStorage.getItem('music');
         if(audioBefID != id){
+         if(typeof(frT) != "undefined"){   
         clearInterval(frT);
+         }
+         if(typeof(fr) != "undefined"){ 
         clearInterval(fr);
+         }
+         if(typeof(frD) != "undefined"){ 
         clearInterval(frD);
+         }
         if(document.getElementById("imgPlayCard"+audioBefID) != null){
         document.getElementById("imgPlayCard"+audioBefID).src = "icons/play.svg";
     }
@@ -52,6 +71,7 @@ function tocar(id,file,photo,name){
     }else{
        pauseMusic(id);
     }
+    }); 
 }
 function playMusic(id){
     if(id == 0){
@@ -198,6 +218,7 @@ function detect(id){
         frT = 100;
         }else{
         control = 1;
+        sessionStorage.setItem('control',1);
         if(document.getElementById("imgPlayCard"+id) != null){
         document.getElementById("imgPlayCard"+id).src = "icons/play.svg";
         }
@@ -206,8 +227,8 @@ function detect(id){
         if(ableSkip == false){
         clearInterval(fr);
         clearInterval(frT);
-    }
-        }   
+        }
+        }  
     }
 }
 function barFunction(){
@@ -232,8 +253,71 @@ function back(sec){
     ableSkip = true;
 }
 function nextMusic(){
+   if(sessionStorage.getItem('nowMusic') != null && sessionStorage.getItem('nowMusic') != (playlist.length-1)){
+   actualPosition = sessionStorage.getItem('nowMusic');
+   var nextPosition =  parseInt(actualPosition) + parseInt(1);   
+   }else{
+   var nextPosition = 0;    
+   }
+   tocar (playlist[nextPosition],'false');
+   sessionStorage.setItem('nowMusic',nextPosition);
+   console.log(nextPosition);
+   console.log(playlist);
+}
+function anteriorMusic(){
     
 }
-function createPL(){
-    
+async function getData(id){
+    await $.ajax({
+    url: 'data.php', 
+    dataType: 'json',
+    type: 'post', 
+    data: { id: id },
+ 
+   success: function(result){
+            var dataID = result;
+            file = dataID[0];
+            name = dataID[1];
+            photo = dataID[2];
+        },
+    error: function(){
+           alert('Ouve um erro na execução da música'); 
+    }
+});
+}
+
+async function getID(pl){
+   await $.ajax({
+    url: 'getID.php', 
+    dataType: 'json',
+    type: 'post', 
+    data: { pl: pl },
+ 
+   success: function(result){
+            playlist = result;
+            //no futuro implementar button que torna o shuffle opcional
+            shuffle(playlist);
+        },
+    error: function(){
+           alert('Ouve um erro na execução da música'); 
+    }
+}); 
+}
+//função retirada do StackOverflow
+function shuffle(array) {
+  var m = array.length, t, i;
+
+  // While there remain elements to shuffle…
+  while (m) {
+
+    // Pick a remaining element…
+    i = Math.floor(Math.random() * m--);
+
+    // And swap it with the current element.
+    t = array[m];
+    array[m] = array[i];
+    array[i] = t;
+  }
+
+  return array;
 }
