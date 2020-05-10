@@ -344,12 +344,13 @@ if(!empty($_POST['subMusic'])){
     while ($iGeneral<$numMusic){
         $ii = $iGeneral+1;
         if( !empty($_POST["nameMusic$ii"]) and !empty($_FILES["fileMusic$ii"]) ){
-        $names[] =  str_replace("'", "***", $_POST["nameMusic$ii"]);
+        $thisName =  str_replace("'", "***", $_POST["nameMusic$ii"]);
+        $names[] =  str_replace('"', "###", $thisName);
         $files[] = $_FILES["fileMusic$ii"];
         
         //tratamento do arquivo de som
-        if ($files[$iGeneral]["type"] !== "audio/mp3") {
-        $error[] = "Você deve enviar um áudio em mp3.";
+        if ($files[$iGeneral]["type"] !== "audio/mp3" and $files[$iGeneral]["type"] !== "audio/mpeg") {
+        $error[] = "Você deve enviar um áudio em mp3.".$files[$iGeneral]["type"];
         }else{
         $ext = "mp3";
         $files[$iGeneral][0] = md5(uniqid(time())) . "." . $ext;

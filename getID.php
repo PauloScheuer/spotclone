@@ -2,10 +2,15 @@
 include 'conexao.php';
 $allids = array();
 if(empty($_POST['pl'])){
-$sqlGetData = "SELECT idMusic FROM music";
+$sqlGetData = "SELECT idMusic FROM music ORDER BY idMusic";
 }else{
 $plID = $_POST['pl'];
-$sqlGetData = "SELECT idMusic FROM music where idMusic IN (SELECT idMusic FROM musicplaylist WHERE idPL = $plID)";
+$plType = $_POST['typer'];
+if($plType == 2){
+$sqlGetData = "SELECT idMusic FROM music where idMusic IN (SELECT idMusic FROM musicplaylist WHERE idPL = $plID) ORDER BY idMusic";
+}elseif($plType == 1){
+$sqlGetData = "SELECT idMusic FROM music WHERE idAlbum = $plID ORDER BY idMusic";    
+}
 }
 $getData = $db->prepare($sqlGetData);
 $getData->execute();

@@ -1,14 +1,13 @@
 <?php
 if(!empty($_GET['search'])){
     $search = $_GET['search'];
-    $where = "and ( (music.nameMusic LIKE '%$search%') or (album.nameAlbum LIKE '%$search%') or"
-            . " ( idMusic IN (SELECT idMusic FROM musicartist WHERE idArtist IN "
+    $where = "WHERE ((album.nameAlbum LIKE '%$search%') or"
+            . " ( idAlbum IN (SELECT idAlbum FROM albumartist WHERE idArtist IN "
             . "(SELECT idArtist FROM artist WHERE nameArtist LIKE '%$search%')) )  )";
 }else{
     $search = "0";
     $where = "";
 }
-
 include './conexao.php';
 if(!empty($_GET['page'])){
     $page = $_GET['page'];
@@ -16,23 +15,23 @@ if(!empty($_GET['page'])){
     $page = 1;
 }
 $lim = $page*10;
-$sql = "SELECT * FROM music,album where music.idAlbum = album.idAlbum $where ORDER BY music.idMusic LIMIT $lim ";
+$sql = "SELECT * FROM album $where LIMIT $lim";
 $sqlDo = $db->prepare($sql);
 $sqlDo->execute();
 if ($sqlDo->rowcount() > 0) {
-    //novo
     echo "<div id='contentgrid'>";
     while ($rs = $sqlDo->fetch(PDO::FETCH_OBJ) ) {
+        $namealbum = str_replace("***", "'", $rs->nameAlbum);
+        $namealbum = str_replace("###", '"', $rs->nameAlbum);
         echo    "<style>"
-                . "#music$rs->idMusic{"
+                . "#album$rs->idAlbum{"
                 . "background-image: url('photos/albuns/$rs->photoAlbum');"
                 . "background-size: cover"
                 . "}"
                 . "</style>"
-        . "<div class='music' id='music$rs->idMusic' onclick='tocar($rs->idMusic, true)' >"
-                . "<div class='playButton'><img src='icons/play.svg' id='imgPlayCard$rs->idMusic'></div>"
-                . "<div class='nameMusic' ><p>".str_replace("***", "'", $rs->nameMusic)."</p></div>";
-        $sql2 = "SELECT * FROM artist, musicartist where artist.idArtist = musicartist.idArtist and musicartist.idMusic=$rs->idMusic";
+        . "<div class='album' id='album$rs->idAlbum' onclick='openAlbum($rs->idAlbum)' >"
+                . "<div class='nameMusic' ><p>$namealbum</p></div>";
+        $sql2 = "SELECT * FROM artist, albumartist where artist.idArtist = albumartist.idArtist and albumartist.idAlbum=$rs->idAlbum";
         $sql2Do = $db->prepare($sql2);
         $sql2Do->execute();
         echo "<div class='nameArtist'><p>";
@@ -44,18 +43,20 @@ if ($sqlDo->rowcount() > 0) {
         echo "</p></div>";
         echo "</div>";
     }
-    $sqltotal = "SELECT * FROM music,album where music.idAlbum = album.idAlbum $where";
+    $sqltotal = "SELECT * FROM album $where";
     $total = $db->prepare($sqltotal);
     $total->execute();
     $totalRegisters = $total->rowcount();
     if($lim<$totalRegisters){
-    $href = "`listMusic.php`";
-    $load = "$search,$href";
+    $href = "`listAlbum.php`";
+    $load = "$search,$href";    
     echo "<img src='icons/plus-circle.svg' onclick='loadmore(".$load.")' id='load'/>"; 
     }
     echo "</div>";
 } else {
-    echo "Sem músicas";
+    echo "Sem álbuns";
 }
+
+
 
 
